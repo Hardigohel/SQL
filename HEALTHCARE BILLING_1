@@ -1,0 +1,51 @@
+--display each patient id and the sum of all of their bills. Keep the new column as payment_remaining
+SELECT patient_id
+, SUM(procedure_bill - payment_received) AS payment_remaining
+FROM billing
+GROUP BY patient_id
+having payment_remaining >150;
+ 
+--calculate the total amount billed, total payments received, and the remaining unpaid balance across all patients.
+ 
+SELECT 
+    SUM(procedure_bill) AS total_amount_billed,
+    SUM(payment_received) AS total_payments_received,
+    SUM(procedure_bill - payment_received) AS outstanding_balance
+FROM billing;
+
+--count how many times each procedure was performed and shows its average original cost and average final bill.
+
+select procedure_description, 
+count (*) as total_count,
+AVG (procedure_cost)as avg,
+avg (procedure_bill) as avg_bill
+from billing
+GROUP BY PROCEDURE_DESCRIPTION
+ORDER BY TOTAL_COUNT ASC;
+
+--group the data by individual patient ID to show the total financial footprint of each person's visit
+
+select patient_id, insurance_provider,
+count (procedure_code) as total_proc,
+sum (procedure_bill)as total_ptbill
+from billing
+group by patient_id, insurance_provider;
+
+--Display the insurance providers and the number of patient bills covered by each provider for lab tests (lab test procedure codes all begin with “80”). Call the new column lab_bills
+
+SELECT 
+    insurance_provider, 
+    COUNT(procedure_bill) AS lab_bills
+FROM billing
+WHERE procedure_code LIKE '80%'
+GROUP BY insurance_provider;
+
+--Add a line to the previous query to display only insurance companies that have billed more than 3 lab procedures
+
+SELECT 
+    insurance_provider, 
+    COUNT(procedure_bill) AS lab_bills
+FROM billing
+WHERE procedure_code LIKE '80%'
+GROUP BY insurance_provider
+HAVING (lab_bills) >3;
